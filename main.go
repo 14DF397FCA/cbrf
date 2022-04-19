@@ -35,15 +35,25 @@ func (rates *ExchangeRates) Print() {
 	}
 }
 
-func (rates *ExchangeRates) toJson() ([]byte, error) {
-	return json.Marshal(rates)
+func (rates *ExchangeRates) toJson() []byte {
+	if data, err := json.Marshal(rates); err != nil {
+		log.Println(err)
+		return nil
+	} else {
+		return data
+	}
 }
 
-func (rates *ExchangeRates) toXML() ([]byte, error) {
-	return xml.Marshal(rates)
+func (rates *ExchangeRates) toXML() []byte {
+	if data, err := xml.Marshal(rates); err != nil {
+		log.Println(err)
+		return nil
+	} else {
+		return data
+	}
 }
 
-func getXML(url string) ([]byte, error) {
+func GetXML(url string) ([]byte, error) {
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, fmt.Errorf("GET error: %v", err)
@@ -60,7 +70,7 @@ func getXML(url string) ([]byte, error) {
 	return buf, nil
 }
 
-func GetExchangeRates(buf []byte) (ExchangeRates, error) {
+func DecodeRates(buf []byte) (ExchangeRates, error) {
 	ExRates := ExchangeRates{}
 	d := xml.NewDecoder(bytes.NewReader(buf))
 	d.CharsetReader = func(charset string, input io.Reader) (io.Reader, error) {
@@ -85,12 +95,12 @@ func IndexPage(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(s))
 }
 
-func CBRFResponser(url string) ExchangeRates {
-	xmlBytes, err := getXML(url)
+func GetCBRFExchangeRates(url string) ExchangeRates {
+	xmlBytes, err := GetXML(url)
 	if err != nil {
 		log.Printf("Failed to get XML: %v", err)
 	}
-	data, err := GetExchangeRates(xmlBytes)
+	data, err := DecodeRates(xmlBytes)
 	if err != nil {
 		log.Println(err)
 	}
@@ -105,7 +115,7 @@ func getUrl(r *http.Request) string {
 	}
 }
 
-func getDate(r *http.Request) string {
+func GetDate(r *http.Request) string {
 	if d := r.FormValue("date_req"); len(d) > 0 {
 		return fmt.Sprintf("date_req=%s", d)
 	}
@@ -113,51 +123,29 @@ func getDate(r *http.Request) string {
 }
 
 func MakeUrl(r *http.Request) string {
-	return fmt.Sprintf("%s?%s", getUrl(r), getDate(r))
+	return fmt.Sprintf("%s?%s", getUrl(r), GetDate(r))
 }
 
-func CBRFtoJson(w http.ResponseWriter, r *http.Request) {
+func CBRF(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		log.Println(err)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-
 	url := MakeUrl(r)
-
 	log.Println("URL", url)
 
-	data := CBRFResponser(url)
+	data := GetCBRFExchangeRates(url)
+	CBRFResp := make([]byte, 0)
 
-	jsonResp, err := data.toJson()
-	if err != nil {
-		log.Println(err)
+	path := r.URL.Path
+	if path == "/cbrf/json" {
+		w.Header().Set("Content-Type", "application/json")
+		CBRFResp = data.toJson()
+	} else {
+		w.Header().Set("Content-Type", "application/xml")
+		CBRFResp = data.toXML()
 	}
-	_, err = w.Write(jsonResp)
-	if err != nil {
-		log.Println(err)
-	}
-}
-
-func CBRFtoXML(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseForm(); err != nil {
-		log.Println(err)
-	}
-
-	w.Header().Set("Content-Type", "application/xml")
-	w.WriteHeader(http.StatusCreated)
-
-	url := MakeUrl(r)
-
-	log.Println("URL", url)
-
-	data := CBRFResponser(url)
-	jsonResp, err := data.toXML()
-	if err != nil {
-		log.Println(err)
-	}
-	_, err = w.Write(jsonResp)
+	_, err := w.Write(CBRFResp)
 	if err != nil {
 		log.Println(err)
 	}
@@ -167,8 +155,8 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", IndexPage)
 	mux.HandleFunc("/index", IndexPage)
-	mux.HandleFunc("/cbrf/json", CBRFtoJson)
-	mux.HandleFunc("/cbrf/xml", CBRFtoXML)
+	mux.HandleFunc("/cbrf/json", CBRF)
+	mux.HandleFunc("/cbrf/xml", CBRF)
 
 	serv := http.Server{
 		Addr:    "0.0.0.0:8000",
