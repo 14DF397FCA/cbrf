@@ -1,8 +1,8 @@
 package main
 
 import (
-	"cbrf/cbrf/currecnyCode"
 	"cbrf/cbrf/currency"
+	"cbrf/cbrf/currencyCode"
 	"cbrf/cbrf/dynamic"
 	"cbrf/cbrf/metal"
 	"log"
@@ -57,11 +57,11 @@ func CurCode(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 
-	allCurs := currecnyCode.MergeCurrencies(currecnyCode.GetCurrenciesMonthly(), currecnyCode.GetCurrenciesDaily())
+	allCurs := currencyCode.MergeCurrencies(currencyCode.GetCurrenciesMonthly(), currencyCode.GetCurrenciesDaily())
 
 	CBRFResp := make([]byte, 0)
 
-	var cur currecnyCode.Currency
+	var cur currencyCode.Currency
 	if f := r.FormValue("id"); f != "" {
 		cur = allCurs.SearchByID(f)
 	} else if f := r.FormValue("isonum"); f != "" {

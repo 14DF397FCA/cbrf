@@ -1,4 +1,4 @@
-package currecnyCode
+package currencyCode
 
 import (
 	"bytes"
