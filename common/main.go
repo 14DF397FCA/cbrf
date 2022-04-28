@@ -1,9 +1,12 @@
 package common
 
 import (
+	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"golang.org/x/text/encoding/charmap"
 	"io"
+	"log"
 	"net/http"
 	"time"
 )
@@ -37,6 +40,25 @@ func Decode(charset string, input io.Reader) (io.Reader, error) {
 func GetToday() string {
 	return time.Now().Format("02/01/2006")
 }
+
 func GetYesterday() string {
 	return time.Now().AddDate(0, 0, -1).Format("02/01/2006")
+}
+
+func ToXML(in interface{}) []byte {
+	if data, err := xml.Marshal(in); err != nil {
+		log.Println(err)
+		return nil
+	} else {
+		return data
+	}
+}
+
+func ToJson(in interface{}) []byte {
+	if data, err := json.Marshal(in); err != nil {
+		log.Println(err)
+		return nil
+	} else {
+		return data
+	}
 }

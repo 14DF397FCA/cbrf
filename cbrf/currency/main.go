@@ -3,7 +3,6 @@ package currency
 import (
 	"bytes"
 	"cbrf/common"
-	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"log"
@@ -25,24 +24,6 @@ type ExchangeRates struct {
 	Date       string     `xml:"Date,attr" json:"Date"`
 	Name       string     `xml:"name,attr" json:"Name"`
 	Currencies []Currency `xml:"Valute" json:"ValCurs"`
-}
-
-func (rates *ExchangeRates) ToJson() []byte {
-	if data, err := json.Marshal(rates); err != nil {
-		log.Println(err)
-		return nil
-	} else {
-		return data
-	}
-}
-
-func (rates *ExchangeRates) ToXML() []byte {
-	if data, err := xml.Marshal(rates); err != nil {
-		log.Println(err)
-		return nil
-	} else {
-		return data
-	}
 }
 
 func DecodeRates(buf []byte) (ExchangeRates, error) {

@@ -3,7 +3,6 @@ package currencyCode
 import (
 	"bytes"
 	"cbrf/common"
-	"encoding/json"
 	"encoding/xml"
 	"log"
 	"strings"
@@ -63,24 +62,6 @@ func DecodeRates(buf []byte) (Currencies, error) {
 		return Currencies{}, err
 	}
 	return rates, nil
-}
-
-func (c *Currency) ToJson() []byte {
-	if data, err := json.Marshal(c); err != nil {
-		log.Println(err)
-		return nil
-	} else {
-		return data
-	}
-}
-
-func (c *Currency) ToXML() []byte {
-	if data, err := xml.Marshal(c); err != nil {
-		log.Println(err)
-		return nil
-	} else {
-		return data
-	}
 }
 
 func GetCurrencies(url string) Currencies {

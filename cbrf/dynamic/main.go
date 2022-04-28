@@ -3,7 +3,6 @@ package dynamic
 import (
 	"bytes"
 	"cbrf/common"
-	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"log"
@@ -26,24 +25,6 @@ type Currencies struct {
 	DateRange2 string     `xml:"DateRange2,attr"`
 	Name       string     `xml:"name,attr"`
 	Record     []Currency `xml:"Record"`
-}
-
-func (rates *Currencies) ToJson() []byte {
-	if data, err := json.Marshal(rates); err != nil {
-		log.Println(err)
-		return nil
-	} else {
-		return data
-	}
-}
-
-func (rates *Currencies) ToXML() []byte {
-	if data, err := xml.Marshal(rates); err != nil {
-		log.Println(err)
-		return nil
-	} else {
-		return data
-	}
 }
 
 func GetRates(r *http.Request) Currencies {

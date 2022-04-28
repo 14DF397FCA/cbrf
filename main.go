@@ -5,6 +5,7 @@ import (
 	"cbrf/cbrf/currencyCode"
 	"cbrf/cbrf/dynamic"
 	"cbrf/cbrf/metal"
+	"cbrf/common"
 	"log"
 	"net/http"
 )
@@ -24,27 +25,27 @@ func CBRF(w http.ResponseWriter, r *http.Request) {
 	case "/cbrf/json":
 		w.Header().Set("Content-Type", "application/json")
 		data := currency.GetRates(r)
-		CBRFResp = data.ToJson()
+		CBRFResp = common.ToJson(data)
 	case "/cbrf/xml":
 		w.Header().Set("Content-Type", "application/xml")
 		data := currency.GetRates(r)
-		CBRFResp = data.ToXML()
+		CBRFResp = common.ToXML(data)
 	case "/cbrf/metals/json":
 		w.Header().Set("Content-Type", "application/json")
 		data := metal.GetRates(r)
-		CBRFResp = data.ToJson()
+		CBRFResp = common.ToJson(data)
 	case "/cbrf/metals/xml":
 		w.Header().Set("Content-Type", "application/xml")
 		data := metal.GetRates(r)
-		CBRFResp = data.ToXML()
+		CBRFResp = common.ToXML(data)
 	case "/cbrf/dynamic/json":
 		w.Header().Set("Content-Type", "application/json")
 		data := dynamic.GetRates(r)
-		CBRFResp = data.ToJson()
+		CBRFResp = common.ToJson(data)
 	case "/cbrf/dynamic/xml":
 		w.Header().Set("Content-Type", "application/xml")
 		data := dynamic.GetRates(r)
-		CBRFResp = data.ToXML()
+		CBRFResp = common.ToXML(data)
 	}
 	_, err := w.Write(CBRFResp)
 	if err != nil {
@@ -72,10 +73,10 @@ func CurCode(w http.ResponseWriter, r *http.Request) {
 
 	if r.Form.Has("json") {
 		w.Header().Set("Content-Type", "application/json")
-		CBRFResp = cur.ToJson()
+		CBRFResp = common.ToJson(cur)
 	} else {
 		w.Header().Set("Content-Type", "application/xml")
-		CBRFResp = cur.ToXML()
+		CBRFResp = common.ToXML(cur)
 	}
 	_, err := w.Write(CBRFResp)
 	if err != nil {

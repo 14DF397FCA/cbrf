@@ -3,7 +3,6 @@ package metal
 import (
 	"bytes"
 	"cbrf/common"
-	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"log"
@@ -25,24 +24,6 @@ type Metals struct {
 	ToDate   string   `xml:"ToDate,attr" json:"ToDate"`
 	Name     string   `xml:"name,attr" json:"Name"`
 	Record   []Metal  `xml:"Record" json:"Record"`
-}
-
-func (rates *Metals) ToJson() []byte {
-	if data, err := json.Marshal(rates); err != nil {
-		log.Println(err)
-		return nil
-	} else {
-		return data
-	}
-}
-
-func (rates *Metals) ToXML() []byte {
-	if data, err := xml.Marshal(rates); err != nil {
-		log.Println(err)
-		return nil
-	} else {
-		return data
-	}
 }
 
 func DecodeRates(buf []byte) (Metals, error) {
