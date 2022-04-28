@@ -27,14 +27,14 @@ type Metals struct {
 }
 
 func DecodeRates(buf []byte) (Metals, error) {
-	rates := Metals{}
+	out := Metals{}
 	d := xml.NewDecoder(bytes.NewReader(buf))
 	d.CharsetReader = common.Decode
-	err := d.Decode(&rates)
+	err := d.Decode(&out)
 	if err != nil {
 		return Metals{}, err
 	}
-	return rates, nil
+	return out, nil
 }
 
 func GetRates(r *http.Request) Metals {

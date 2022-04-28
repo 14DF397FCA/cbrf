@@ -27,15 +27,15 @@ type ExchangeRates struct {
 }
 
 func DecodeRates(buf []byte) (ExchangeRates, error) {
-	rates := ExchangeRates{}
+	out := ExchangeRates{}
 	d := xml.NewDecoder(bytes.NewReader(buf))
 	d.CharsetReader = common.Decode
 
-	err := d.Decode(&rates)
+	err := d.Decode(&out)
 	if err != nil {
 		return ExchangeRates{}, err
 	}
-	return rates, nil
+	return out, nil
 }
 
 func GetRates(r *http.Request) ExchangeRates {

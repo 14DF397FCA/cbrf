@@ -61,12 +61,12 @@ func makeURL(r *http.Request) string {
 }
 
 func DecodeRates(buf []byte) (Currencies, error) {
-	rates := Currencies{}
+	out := Currencies{}
 	d := xml.NewDecoder(bytes.NewReader(buf))
 	d.CharsetReader = common.Decode
-	err := d.Decode(&rates)
+	err := d.Decode(&out)
 	if err != nil {
 		return Currencies{}, err
 	}
-	return rates, nil
+	return out, nil
 }
