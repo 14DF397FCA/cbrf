@@ -64,23 +64,23 @@ func DecodeRates(buf []byte) (Currencies, error) {
 	return out, nil
 }
 
-func GetCurrencies(url string) Currencies {
+func GetCurrencies(url string) interface{} {
 	xmlData, err := common.GetXML(url)
 	if err != nil {
 		log.Println(err)
 	}
-	data, err := DecodeRates(xmlData)
+	data, err := common.DecodeRates(xmlData, &Currencies{})
 	if err != nil {
 		log.Println(err)
 	}
 	return data
 }
 
-func GetCurrenciesMonthly() Currencies {
+func GetCurrenciesMonthly() interface{} {
 	//	https://www.cbr.ru/development/SXML/ Example 1
 	return GetCurrencies("https://www.cbr.ru/scripts/XML_valFull.asp?d=1")
 }
-func GetCurrenciesDaily() Currencies {
+func GetCurrenciesDaily() interface{} {
 	//	https://www.cbr.ru/development/SXML/ Example 1
 	return GetCurrencies("https://www.cbr.ru/scripts/XML_valFull.asp?d=0")
 }

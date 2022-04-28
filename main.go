@@ -2,7 +2,6 @@ package main
 
 import (
 	"cbrf/cbrf/currency"
-	"cbrf/cbrf/currencyCode"
 	"cbrf/cbrf/dynamic"
 	"cbrf/cbrf/metal"
 	"cbrf/common"
@@ -54,34 +53,34 @@ func CBRF(w http.ResponseWriter, r *http.Request) {
 }
 
 func CurCode(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseForm(); err != nil {
-		log.Println(err)
-	}
-
-	allCurs := currencyCode.MergeCurrencies(currencyCode.GetCurrenciesMonthly(), currencyCode.GetCurrenciesDaily())
-
-	CBRFResp := make([]byte, 0)
-
-	var cur currencyCode.Currency
-	if f := r.FormValue("id"); f != "" {
-		cur = allCurs.SearchByID(f)
-	} else if f := r.FormValue("isonum"); f != "" {
-		cur = allCurs.SearchByISONum(f)
-	} else if f := r.FormValue("isocode"); f != "" {
-		cur = allCurs.SearchByISOCharCode(f)
-	}
-
-	if r.Form.Has("json") {
-		w.Header().Set("Content-Type", "application/json")
-		CBRFResp = common.ToJson(cur)
-	} else {
-		w.Header().Set("Content-Type", "application/xml")
-		CBRFResp = common.ToXML(cur)
-	}
-	_, err := w.Write(CBRFResp)
-	if err != nil {
-		log.Println(err)
-	}
+	//if err := r.ParseForm(); err != nil {
+	//	log.Println(err)
+	//}
+	//
+	//allCurs := currencyCode.MergeCurrencies(currencyCode.GetCurrenciesMonthly(), currencyCode.GetCurrenciesDaily())
+	//
+	//CBRFResp := make([]byte, 0)
+	//
+	//var cur currencyCode.Currency
+	//if f := r.FormValue("id"); f != "" {
+	//	cur = allCurs.SearchByID(f)
+	//} else if f := r.FormValue("isonum"); f != "" {
+	//	cur = allCurs.SearchByISONum(f)
+	//} else if f := r.FormValue("isocode"); f != "" {
+	//	cur = allCurs.SearchByISOCharCode(f)
+	//}
+	//
+	//if r.Form.Has("json") {
+	//	w.Header().Set("Content-Type", "application/json")
+	//	CBRFResp = common.ToJson(cur)
+	//} else {
+	//	w.Header().Set("Content-Type", "application/xml")
+	//	CBRFResp = common.ToXML(cur)
+	//}
+	//_, err := w.Write(CBRFResp)
+	//if err != nil {
+	//	log.Println(err)
+	//}
 }
 
 func main() {

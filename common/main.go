@@ -1,6 +1,7 @@
 package common
 
 import (
+	"bytes"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
@@ -8,6 +9,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"reflect"
 	"time"
 )
 
@@ -61,4 +63,15 @@ func ToJson(in interface{}) []byte {
 	} else {
 		return data
 	}
+}
+
+func DecodeRates(buf []byte, s interface{}) (interface{}, error) {
+	out := reflect.New(reflect.TypeOf(s)).Interface()
+	d := xml.NewDecoder(bytes.NewReader(buf))
+	d.CharsetReader = Decode
+	err := d.Decode(&out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }

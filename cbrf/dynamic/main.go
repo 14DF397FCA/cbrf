@@ -1,7 +1,6 @@
 package dynamic
 
 import (
-	"bytes"
 	"cbrf/common"
 	"encoding/xml"
 	"fmt"
@@ -18,7 +17,7 @@ type Currency struct {
 }
 
 type Currencies struct {
-	XMLName    xml.Name   `xml:"Currencies"`
+	XMLName    xml.Name   `xml:"ValCurs"`
 	Text       string     `xml:",chardata"`
 	ID         string     `xml:"ID,attr"`
 	DateRange1 string     `xml:"DateRange1,attr"`
@@ -27,7 +26,7 @@ type Currencies struct {
 	Record     []Currency `xml:"Record"`
 }
 
-func GetRates(r *http.Request) Currencies {
+func GetRates(r *http.Request) interface{} {
 	url := makeURL(r)
 	log.Println("URL", url)
 
@@ -35,9 +34,10 @@ func GetRates(r *http.Request) Currencies {
 	if err != nil {
 		log.Printf("Failed to get XML: %v", err)
 	}
-	data, err := DecodeRates(xmlBytes)
+	//data, err := DecodeRates(xmlBytes)
+	data, err := common.DecodeRates(xmlBytes, &Currencies{})
 	if err != nil {
-		log.Println(err)
+		log.Println("Error in decode:", err)
 	}
 	return data
 }
@@ -58,15 +58,4 @@ func makeURL(r *http.Request) string {
 	log.Println("VAL_NM_RQ:", cur)
 
 	return fmt.Sprintf("https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=%s&date_req2=%s&VAL_NM_RQ=%s", dateReq1, dateReq2, cur)
-}
-
-func DecodeRates(buf []byte) (Currencies, error) {
-	out := Currencies{}
-	d := xml.NewDecoder(bytes.NewReader(buf))
-	d.CharsetReader = common.Decode
-	err := d.Decode(&out)
-	if err != nil {
-		return Currencies{}, err
-	}
-	return out, nil
 }

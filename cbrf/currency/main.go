@@ -23,7 +23,7 @@ type ExchangeRates struct {
 	Text       string     `xml:",chardata" json:"Text"`
 	Date       string     `xml:"Date,attr" json:"Date"`
 	Name       string     `xml:"name,attr" json:"Name"`
-	Currencies []Currency `xml:"Valute" json:"ValCurs"`
+	Currencies []Currency `xml:"Valute" json:"Valute"`
 }
 
 func DecodeRates(buf []byte) (ExchangeRates, error) {
@@ -38,7 +38,7 @@ func DecodeRates(buf []byte) (ExchangeRates, error) {
 	return out, nil
 }
 
-func GetRates(r *http.Request) ExchangeRates {
+func GetRates(r *http.Request) interface{} {
 	url := makeUrl(r)
 	log.Println("URL", url)
 
@@ -46,7 +46,8 @@ func GetRates(r *http.Request) ExchangeRates {
 	if err != nil {
 		log.Printf("Failed to get XML: %v", err)
 	}
-	data, err := DecodeRates(xmlBytes)
+	//data, err := DecodeRates(xmlBytes)
+	data, err := common.DecodeRates(xmlBytes, &ExchangeRates{})
 	if err != nil {
 		log.Println(err)
 	}

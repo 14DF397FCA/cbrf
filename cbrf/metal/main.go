@@ -1,7 +1,6 @@
 package metal
 
 import (
-	"bytes"
 	"cbrf/common"
 	"encoding/xml"
 	"fmt"
@@ -26,18 +25,7 @@ type Metals struct {
 	Record   []Metal  `xml:"Record" json:"Record"`
 }
 
-func DecodeRates(buf []byte) (Metals, error) {
-	out := Metals{}
-	d := xml.NewDecoder(bytes.NewReader(buf))
-	d.CharsetReader = common.Decode
-	err := d.Decode(&out)
-	if err != nil {
-		return Metals{}, err
-	}
-	return out, nil
-}
-
-func GetRates(r *http.Request) Metals {
+func GetRates(r *http.Request) interface{} {
 	url := makeURL(r)
 	log.Println("URL", url)
 
@@ -45,7 +33,7 @@ func GetRates(r *http.Request) Metals {
 	if err != nil {
 		log.Printf("Failed to get XML: %v", err)
 	}
-	data, err := DecodeRates(xmlBytes)
+	data, err := common.DecodeRates(xmlBytes, &Metals{})
 	if err != nil {
 		log.Println(err)
 	}
