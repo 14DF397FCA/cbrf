@@ -1,52 +1,61 @@
 package main
 
 import (
-	"cbrf/cbrf/currency"
-	"cbrf/cbrf/dynamic"
-	"cbrf/cbrf/metal"
+	"cbrf/cbr/dynamic"
+	CBRRates "cbrf/cbr/exchangerates"
+	"cbrf/cbr/metal"
 	"cbrf/common"
+	QIWIRates "cbrf/qiwi/exchangerates"
 	"log"
 	"net/http"
 )
 
 func IndexPage(w http.ResponseWriter, r *http.Request) {
-	s := "CBRF to json/xml in UTF-8\n"
+	s := "Rates to json/xml in UTF-8\n"
 	w.Write([]byte(s))
 }
 
-func CBRF(w http.ResponseWriter, r *http.Request) {
+func Rates(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		log.Println(err)
 	}
 
-	CBRFResp := make([]byte, 0)
+	resp := make([]byte, 0)
 	switch r.URL.Path {
-	case "/cbrf/json":
+	case "/cbr/json":
 		w.Header().Set("Content-Type", "application/json")
-		data := currency.GetRates(r)
-		CBRFResp = common.ToJson(data)
-	case "/cbrf/xml":
+		data := CBRRates.Do(r)
+		resp = common.ToJson(data)
+	case "/cbr/xml":
 		w.Header().Set("Content-Type", "application/xml")
-		data := currency.GetRates(r)
-		CBRFResp = common.ToXML(data)
-	case "/cbrf/metals/json":
+		data := CBRRates.Do(r)
+		resp = common.ToXML(data)
+	case "/cbr/metals/json":
 		w.Header().Set("Content-Type", "application/json")
-		data := metal.GetRates(r)
-		CBRFResp = common.ToJson(data)
-	case "/cbrf/metals/xml":
+		data := metal.Do(r)
+		resp = common.ToJson(data)
+	case "/cbr/metals/xml":
 		w.Header().Set("Content-Type", "application/xml")
-		data := metal.GetRates(r)
-		CBRFResp = common.ToXML(data)
-	case "/cbrf/dynamic/json":
+		data := metal.Do(r)
+		resp = common.ToXML(data)
+	case "/cbr/dynamic/json":
 		w.Header().Set("Content-Type", "application/json")
-		data := dynamic.GetRates(r)
-		CBRFResp = common.ToJson(data)
-	case "/cbrf/dynamic/xml":
+		data := dynamic.Do(r)
+		resp = common.ToJson(data)
+	case "/cbr/dynamic/xml":
 		w.Header().Set("Content-Type", "application/xml")
-		data := dynamic.GetRates(r)
-		CBRFResp = common.ToXML(data)
+		data := dynamic.Do(r)
+		resp = common.ToXML(data)
+	case "/qiwi/json":
+		w.Header().Set("Content-Type", "application/json")
+		data := QIWIRates.Do(r)
+		resp = common.ToJson(data)
+	case "/qiwi/xml":
+		w.Header().Set("Content-Type", "application/xml")
+		data := QIWIRates.Do(r)
+		resp = common.ToXML(data)
 	}
-	_, err := w.Write(CBRFResp)
+	_, err := w.Write(resp)
 	if err != nil {
 		log.Println(err)
 	}
@@ -87,13 +96,15 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", IndexPage)
 	mux.HandleFunc("/index", IndexPage)
-	mux.HandleFunc("/cbrf/json", CBRF)
-	mux.HandleFunc("/cbrf/xml", CBRF)
-	mux.HandleFunc("/cbrf/metals/json", CBRF)
-	mux.HandleFunc("/cbrf/metals/xml", CBRF)
-	mux.HandleFunc("/cbrf/dynamic/json", CBRF)
-	mux.HandleFunc("/cbrf/dynamic/xml", CBRF)
-	mux.HandleFunc("/cbrf/currency", CurCode)
+	mux.HandleFunc("/cbr/json", Rates)
+	mux.HandleFunc("/cbr/xml", Rates)
+	mux.HandleFunc("/cbr/metals/json", Rates)
+	mux.HandleFunc("/cbr/metals/xml", Rates)
+	mux.HandleFunc("/cbr/dynamic/json", Rates)
+	mux.HandleFunc("/cbr/dynamic/xml", Rates)
+	mux.HandleFunc("/qiwi/json", Rates)
+	mux.HandleFunc("/qiwi/xml", Rates)
+	mux.HandleFunc("/currency/json", CurCode)
 
 	address := "0.0.0.0:8000"
 	serv := http.Server{
