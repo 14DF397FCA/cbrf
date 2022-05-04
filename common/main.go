@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func GetXML(url string) ([]byte, error) {
+func GetData(url string) ([]byte, error) {
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, fmt.Errorf("GET error: %v", err)
@@ -63,6 +63,20 @@ func ToJson(in interface{}) []byte {
 	} else {
 		return data
 	}
+}
+
+func GetRates(url string, t interface{}) interface{} {
+	log.Println("URL", url)
+
+	dataBytes, err := GetData(url)
+	if err != nil {
+		log.Printf("Failed to get XML: %v", err)
+	}
+	data, err := DecodeRates(dataBytes, t)
+	if err != nil {
+		log.Println(err)
+	}
+	return data
 }
 
 func DecodeRates(buf []byte, s interface{}) (interface{}, error) {
