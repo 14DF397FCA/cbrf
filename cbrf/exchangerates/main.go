@@ -42,12 +42,12 @@ func GetRates(r *http.Request) interface{} {
 	url := makeUrl(r)
 	log.Println("URL", url)
 
-	xmlBytes, err := common.GetXML(url)
+	dataBytes, err := common.GetXML(url)
 	if err != nil {
 		log.Printf("Failed to get XML: %v", err)
 	}
-	//data, err := DecodeRates(xmlBytes)
-	data, err := common.DecodeRates(xmlBytes, &ExchangeRates{})
+	//data, err := DecodeRates(dataBytes)
+	data, err := common.DecodeRates(dataBytes, &ExchangeRates{})
 	if err != nil {
 		log.Println(err)
 	}
