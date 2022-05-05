@@ -1,6 +1,7 @@
 package main
 
 import (
+	CBRCurs "cbrf/cbr/currencies"
 	"cbrf/cbr/dynamic"
 	CBRRates "cbrf/cbr/exchangerates"
 	"cbrf/cbr/metal"
@@ -9,6 +10,8 @@ import (
 	"log"
 	"net/http"
 )
+
+var AllCBRCurrencies = CBRCurs.GetAllCurrencies()
 
 func IndexPage(w http.ResponseWriter, r *http.Request) {
 	s := "Rates to json/xml in UTF-8\n"
@@ -48,11 +51,11 @@ func Rates(w http.ResponseWriter, r *http.Request) {
 		resp = common.ToXML(data)
 	case "/qiwi/json":
 		w.Header().Set("Content-Type", "application/json")
-		data := QIWIRates.Do(r)
+		data := QIWIRates.Do(r.Form.Has("rich"), AllCBRCurrencies)
 		resp = common.ToJson(data)
 	case "/qiwi/xml":
 		w.Header().Set("Content-Type", "application/xml")
-		data := QIWIRates.Do(r)
+		data := QIWIRates.Do(r.Form.Has("rich"), AllCBRCurrencies)
 		resp = common.ToXML(data)
 	}
 	_, err := w.Write(resp)
@@ -66,11 +69,11 @@ func CurCode(w http.ResponseWriter, r *http.Request) {
 	//	log.Println(err)
 	//}
 	//
-	//allCurs := currencyCode.MergeCurrencies(currencyCode.GetCurrenciesMonthly(), currencyCode.GetCurrenciesDaily())
+	//allCurs := currencies.MergeCurrencies(currencies.GetCurrenciesMonthly(), currencies.GetCurrenciesDaily())
 	//
 	//CBRFResp := make([]byte, 0)
 	//
-	//var cur currencyCode.Currency
+	//var cur currencies.Currency
 	//if f := r.FormValue("id"); f != "" {
 	//	cur = allCurs.SearchByID(f)
 	//} else if f := r.FormValue("isonum"); f != "" {
